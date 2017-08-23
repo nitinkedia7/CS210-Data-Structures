@@ -33,12 +33,77 @@ void printList(node *head) {
 	}
 	cout << endl;
 }
+/* Construction of Winner Tree */
+int searchOrigin(node *tree[], int n) {
+	int i = 0;
+	while (i < n-1) {
+		if (tree[i] == tree[2*i+1]) i = 2*i+1;
+		else i = 2*i+2;
+	}
+	return i;
+}
+
+node *match(node *contestant1, node *contestant2) {
+	if (contestant1 == NULL && contestant2 == NULL) {
+		return NULL;
+	}
+	else if (contestant1 == NULL && contestant2 != NULL) {
+		return contestant2;
+	}
+	else if (contestant1 != NULL && contestant2 == NULL) {
+		return contestant1;
+	}	
+	else {
+		if (contestant1->data < contestant2->data) {
+			return contestant1;	
+		}
+		else {
+			return contestant2;
+		}
+	}
+}
+
+void afterRound1(node **tree, int i) {
+	if (i > -1) {
+		if (i%2 == 0) i = (i/2)-1;
+		else i = (i/2);
+		tree[i] = match(tree[2*i+1], tree[2*i+2]);
+		afterRound1(tree, i);
+	}
+}
+
+node *winnerTree(node **head, int n) {
+	node *mergedHead = NULL;
+	
+	node *tree[2*n-1]; // playground
+	for (int i = n-1; i<2*n-1; i++) {
+		tree[i] = head[i-n+1];
+	}
+	for (int i = n-2; i > -1; i--) {
+		tree[i] = match(tree[2*i+1], tree[2*i+2]);
+	}
+	
+	while (tree[0] != NULL) {
+		mergedHead = createNode(mergedHead, tree[0]->data);
+		int i = searchOrigin(tree, n);
+		tree[i] = tree[i]->next;
+		afterRound1(tree, i);
+	}
+	return mergedHead;
+}
 
 int main() {
 	int k;
 	cout << "Enter number of sequences: ";
 	cin >> k;
-	node *head[k];
+	int n;
+	for (n=0; ; n++) {
+		if (pow(2, n) >= k) {
+			n = pow(2, n);
+			break;
+		}
+	}
+	node *head[n];
 	for (int i = 0; i < k; i++) {
 		head[i] = NULL;
 		int num; char c;
@@ -47,8 +112,13 @@ int main() {
 			head[i] = createNode(head[i], num);
 		} while(c != '\n');
 	}
-	for (int i = 0; i < k; i++) {
+	for (int i = k; i < n; i++) {
+		head[i] = NULL;
+	}
+	for (int i = 0; i < n; i++) {
 		printList(head[i]);
 	}
+	node *mergedHead = winnerTree(head, n);
+	printList(mergedHead);
 	return 0;
 }
