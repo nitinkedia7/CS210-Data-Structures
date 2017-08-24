@@ -38,48 +38,48 @@ int checkBoundary(char **jungle, int row, int column, int boundaryL[2][2]) {
 	return count;
 }
 
-void isGood(char **jungle, int row, int column, int i, int j, int exitI, int exitJ, int *path) {
-	if (i > 0) {
-		if (jungle[i-1][j] == 'L') {
-			
-			if (i-1 == exitI && j == exitJ) (*path)++;
-			else {
-				jungle[i][j] = 'T';
-				isGood(jungle, row, column, i-1, j, exitI, exitJ, path);
-				jungle[i][j] = 'L';
-			}
-		}
+int findPath(char **jungle, int row, int column, int i, int j, int prevI, int prevJ, int exitI, int exitJ, int *path) {
+	if (jungle[i][j] == 'L') jungle[i][j] = 'M';
+	else if (jungle[i][j] == 'M') jungle[i][j] = 'T';	
+
+	if (i == exitI && j == exitJ) {
+		(*path)++;
+		return 0;
 	}
-	if (i < row-1) {
-		if (jungle[i+1][j] == 'L') {
-			if (i+1 == exitI && j == exitJ) (*path)++;
-			else {
-				jungle[i][j] = 'T';
-				isGood(jungle, row, column, i+1, j, exitI, exitJ, path);
-				jungle[i][j] = 'L';
-			}		
+	if (i > 0) {
+		if (i-1 == prevI && j == prevJ) {
+			// do not return to parent
+		}
+		else if (jungle[i-1][j] != 'T') {
+			findPath(jungle, row, column, i-1, j, i, j, exitI, exitJ, path);
 		}
 	}
 	if (j > 0) {
-		if (jungle[i][j-1] == 'L') {
-			if (i == exitI && j-1 == exitJ) (*path)++;
-			else {
-				jungle[i][j] = 'T';
-				isGood(jungle, row, column, i, j-1, exitI, exitJ, path);
-				jungle[i][j] = 'L';
-			}
+		if (i == prevI && j-1 == prevJ) {
+			// do not return to parent
+		}
+		else if (jungle[i][j-1] != 'T') {
+			findPath(jungle, row, column, i, j-1, i, j, exitI, exitJ, path);
 		}
 	}
+	if (i < row-1) {
+		if (i+1 == prevI && j == prevJ) {
+			// do not return to parent
+		}
+		else if (jungle[i+1][j] != 'T') {
+			findPath(jungle, row, column, i+1, j, i, j, exitI, exitJ, path);
+		}
+	}
+
 	if (j < column-1) {
-		if (jungle[i][j+1] == 'L') {
-			if (i == exitI && j+1 == exitJ) (*path)++;
-			else {
-				jungle[i][j] = 'T'; 
-				isGood(jungle, row, column, i, j+1, exitI, exitJ, path);
-				jungle[i][j] = 'L';
-			}
+		if (i == prevI && j+1 == prevJ) {
+			// do not return to parent
+		}
+		else if (jungle[i][j+1] != 'T') {
+			findPath(jungle, row, column, i, j+1, i, j, exitI, exitJ, path);
 		}
 	}
+	return 0;
 }
 
 int main() {
@@ -101,12 +101,10 @@ int main() {
 		}
 		//printJungle(jungle, row, column);
 		int boundaryL[2][2];
-		cout << checkBoundary(jungle, row, column, boundaryL) << " boundary L present." << endl;
+		//cout << checkBoundary(jungle, row, column, boundaryL) << " boundary L present." << endl;
 		if (checkBoundary(jungle, row, column, boundaryL) == 2) { 
-			printJungle(jungle, row, column);
-			cout << boundaryL[0][0] << boundaryL[0][1] << boundaryL[1][0] << boundaryL[1][1] << endl;
 			int path = 0;
-			isGood(jungle, row, column, boundaryL[0][0], boundaryL[0][1], boundaryL[1][0],boundaryL[1][1], &path);
+			findPath(jungle, row, column, boundaryL[0][0], boundaryL[0][1], row, column, boundaryL[1][0],boundaryL[1][1], &path);
 			if (path == 1) {
 				cout << "Submitted!" << endl;
 			}
