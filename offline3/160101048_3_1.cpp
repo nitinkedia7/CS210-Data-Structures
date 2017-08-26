@@ -115,7 +115,7 @@ int main() {
 		head[i] = NULL;
 		int num; char c;
 		do {
-			scanf("%d%c", &num, &c);
+			scanf("%d%c", &num, &c); // Do not enter space after last element of a sequence
 			head[i] = createNode(head[i], num);
 		} while(c != '\n');
 	}

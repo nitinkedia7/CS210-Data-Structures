@@ -40,10 +40,11 @@ int checkBoundary(char **jungle, int row, int column, int boundaryL[2][2]) {
 }
 
 // findPath finds the number of paths from entry to exit recursively and stores it in "path"
-// Once a L element is visited it changed to M;
+// Once a L element is visited it is changed to M.
 // Again if a M element is visited it is changed to T so that no further visits can occur
-// Thus, only two visits are permitted at max, more than two visits means a loop and hence multiple paths
-// immediate return to previous is not permitted
+// Thus, only two visits are permitted at maximum to avoid infinite loops.
+// Presence of a loop in a path will result in multiple paths.
+// In a path, immediate return to previous L is not permitted.
 int findPath(char **jungle, int row, int column, int i, int j, int prevI, int prevJ, int exitI, int exitJ, int *path) {
 	
 	if (jungle[i][j] == 'L') jungle[i][j] = 'M'; // updating number of visits
@@ -96,7 +97,10 @@ int main() {
 		cin >> row >> column;
 		
 		if (row == 0 && column == 0) break; // end of input
-		else if (row == 0 || column == 0) continue; // invalid input
+		else if (row <= 0 || column <= 0) { // row and columns must be positive integers
+			printf("Invalid Input!\n");
+			continue;
+		}
 
 		// jungle is stored as a matrice in 2D-Array of characters
 		char **jungle = new char *[row];
@@ -114,7 +118,7 @@ int main() {
 			int path = 0;
 			findPath(jungle, row, column, boundaryL[0][0], boundaryL[0][1], row, column, boundaryL[1][0],boundaryL[1][1], &path);// arbitary previous index sent
 			if (path == 1) {
-				cout << "Submitted!" << endl; // unique path is found
+				cout << "Submitted!" << endl; // unique path is present
 			}
 			else {
 				cout << "Bad Luck!" << endl;	// multiple paths are present
