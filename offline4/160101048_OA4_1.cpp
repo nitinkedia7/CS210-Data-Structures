@@ -2,37 +2,39 @@
 // Description: Sort and Reduce an integer array
 
 #include <iostream>
+#include <cstdlib>
 using namespace std;
 
-// bubbleSort sorts a integer array in ascending order with all optimisations in Bubble Sort
-void bubbleSort(int *array, int n) {
-	int i, j, k;
-	for (i = 0; i < n-1; i++) {
-		int isSwap = 0;
-		if (i%2 == 0) {
-			for (j=(i/2); j<n-1-(i/2); j++) { // sending max to leftmost position
-				if (array[j] > array[j+1]) {
-					int temp = array[j];
-					array[j] = array[j+1];
-					array[j+1] = temp;
-					isSwap++;
-				}
-			}
-			if (isSwap == 0) break;
-		}
-		else {
-			for (k = n-2-(i/2); k > (i/2); k--) { // sending min to rightmost position
-				if (array[k] < array[k-1]) {
-					int temp = array[k];
-					array[k] = array[k-1];
-					array[k-1] = temp;
-					isSwap++;
-				}
-			}
-			if (isSwap == 0) break;
+// quickSort sorts the integer array in ascending order with orden nlogn
+void swap(int *array, int i, int j) {
+	int temp = array[i];
+	array[i] = array[j];
+	array[j] = temp;
+}
+
+void partition(int *array, int l, int u, int *p) {
+	int pivot = array[*p];
+	swap(array, l, *p);
+	int down = l;
+	while (l < u) {
+		while (array[l] <= pivot && l < u) l++;
+		while (array[u] > pivot) u--;
+		if (l < u) {
+			swap(array, l, u);
 		}
 	}
-} 
+	swap(array, down, u);
+	*p = u;
+}
+
+void quickSort(int *array, int l, int u) {
+	if (l < u) {
+		int p = (u+l)/2;
+		partition(array, l, u, &p);
+		quickSort(array, l, p-1);
+		quickSort(array, p+1, u);
+	}
+}
 
 int main() {
 	int n;
@@ -48,7 +50,7 @@ int main() {
 		cin >> array[i];
 	}
 	for (int i = 0; i < n; i++) {
-		bubbleSort(array, n-i); // sort given array decrementing its length progessively 
+		quickSort(array, 0, n-i-1); // sort given array decrementing its length progessively 
 		for (int j = 0; j < n-1-i ; j++) {
 			array[j] = array[j+1]-array[j]; // since array is sorted ascendingly, array[j+1] >= array[j], thus difference will be automatically absolute
 		}
