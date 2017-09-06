@@ -13,11 +13,11 @@ int binSearch(int *array, int l, int u, int num, int *ptrCmpsn) {
 		int p = (u+l)/2; // middle element
 		
 		(*ptrCmpsn)++; // imminent comparison
-		if (array[p] < num) { 
-			binSearch(array, p+1, u, num, ptrCmpsn);// searching left half
+		if (array[p] > num) { 
+			binSearch(array, l, p-1, num, ptrCmpsn);// searching left half
 		}
 		else {
-			binSearch(array, l, p-1, num, ptrCmpsn); // searching right half
+			binSearch(array, p+1, u, num, ptrCmpsn); // searching right half
 		}
 		// Note that we eliminated p as an answer but it will be right answer if array[p] <= num and array[p] >= num;
 		// in such cases, binSearch(array, p, p-1, ptrCmpsn) will be called thereby returning p from 1st statement;   
