@@ -19,7 +19,7 @@ int binSearch(int *array, int l, int u, int num, int *ptrCmpsn) {
 		else {
 			binSearch(array, p+1, u, num, ptrCmpsn); // searching right half
 		}
-		// Note that we eliminated p as an answer but it will be right answer if array[p] <= num and array[p] >= num;
+		// Note that we eliminated p as an answer but it will be right answer if array[p] <= num and array[p+1] >= num;
 		// in such cases, binSearch(array, p, p-1, ptrCmpsn) will be called thereby returning p from 1st statement;   
 	}
 }
