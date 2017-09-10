@@ -1,6 +1,3 @@
-// heapSort.cpp: Nitin Kedia
-// Description - Sort a integer array in ascending order using Heap Sort
-
 #include <iostream>
 using namespace std;
 

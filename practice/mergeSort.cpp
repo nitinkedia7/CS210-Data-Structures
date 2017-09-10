@@ -1,6 +1,3 @@
-// mergeSort.cpp: Nitin Kedia
-// Description: sort an integer array ascendingly using Merge Sort
-
 #include <iostream>
 #include <bits/stdc++.h>
 using namespace std;
