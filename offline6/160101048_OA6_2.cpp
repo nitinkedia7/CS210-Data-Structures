@@ -20,13 +20,10 @@ int findMin(customer *array, int i, int j) {
 }
 
 bool isMin(customer first, customer second) {
-	// cout << first.o << " " << first.c << endl;
-	// cout << second.o << " " << second.c << endl;
 	if (first.c < second.c) return true;
 	else if (first.c == second.c) {
 		if (first.o < second.o) return true;
 	}
-	// cout << "false" << endl;
 	return false;
 }
 
@@ -59,34 +56,9 @@ void buildMinHeap(customer *array, int n) {
 	}
 }
 
-// void decreaseKey(customer *array, int i, customer x) {
-// 	if (isMin(x, array[i])) {
-// 		array[i] = x;
-// 		int p = (i-1)/2;
-// 		while (p >= 0) {
-// 			if (isMin(array[i], array[p]))  {
-// 				swapper(array, i, p);
-// 				i = p;
-// 				p = (i-1)/2;
-
-// 			}
-// 			else break; 
-// 		}
-// 	}
-// }
-// void insert(customer *array, int *pn, customer x) {
-// 	int i = (*pn);
-// 	array[i].c = LLONG_MAX;
-// 	array[i].o = LLONG_MAX;
-	
-// 	decreaseKey(array, i, x);
-// 	*pn = *pn+1;
-// }
-
 void insert(customer *array, int *pn, customer x) {
 	int i = (*pn);
 	array[i] = x;
-	cout << array[i].o << " " << array[i].c << endl;
 	int p = (i-1)/2;
 	while (p >= 0) {
 		if (isMin(array[i], array[p]))  {
@@ -99,7 +71,6 @@ void insert(customer *array, int *pn, customer x) {
 			break; 
 		}
 	}
-	cout << array[i].o << " " << array[i].c << endl;
 	*pn = *pn+1;
 }
 
@@ -143,15 +114,15 @@ void quickSort(customer *array, int l, int u) {
 
 int main() {
 	int n;
+	cout << "Enter Input: " << endl;
 	cin >> n;
+	if (n <= 0) return 0;
 
 	customer in_array[n];
 	for (int i = 0; i < n; i++) {
 		cin >> in_array[i].o >> in_array[i].c;
 	}
-	print(in_array, n);
 	quickSort(in_array, 0, n-1);
-	print(in_array, n);
 
 	customer serve_array[n];
 	int i = 0, j = i+1;
@@ -165,38 +136,14 @@ int main() {
 		total_wait_time += (time_elapsed - serve_array[i].o);
 
 		while (j < n && in_array[j].o <= time_elapsed) {
-			cout << l << endl;
 			insert(priority_queue, &l, in_array[j]);
-			cout << "priority_queue: " << endl;
-			print(priority_queue, l);
-			cout << l << endl;
 			j++;
-		}
-		// buildMinHeap(priority_queue, l);
-		
+		}		
 		i++;
 		if (l > 0) serve_array[i] = extractMin(priority_queue, &l);
-		
-		// else {
-		// 	serve_array[i] = array[i];
-		// 	time_elapsed = array[i].c;
-		// } 
-	
-		// while (j < n && in_array[j].o <= time_elapsed) {
-		// 	priority_queue[l++] = in_array[j];
-		// 	j++;
-		// }
-		// buildMinHeap(priority_queue, l);
-		// // print(priority_queue, l);
-		// i++;
-		// if (l > 0) serve_array[i] = extractMin(priority_queue, &l);
-		// // else {
-		// // 	serve_array[i] = array[i];
-		// // 	time_elapsed = array[i].c;
-		// // } 
-	}while (i < n);
-	cout << "serve_array :" << endl; 
-	print(serve_array, n);
-
+	} while (i < n);
+	// print(serve_array, n);
+	cout << "Minimum average waiting time:" << endl;
 	cout << (total_wait_time/n) << endl;
+	return 0;
 }
