@@ -141,8 +141,12 @@ int main() {
 		}		
 		i++;
 		if (l > 0) serve_array[i] = extractMin(priority_queue, &l);
+		if (j <= i) {
+			serve_array[i] = in_array[i];
+			j = i+1;
+		}
 	} while (i < n);
-	// print(serve_array, n);
+	//print(serve_array, n);
 	cout << "Minimum average waiting time:" << endl;
 	cout << (total_wait_time/n) << endl;
 	return 0;
