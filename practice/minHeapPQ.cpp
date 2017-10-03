@@ -59,8 +59,6 @@ void decreaseKey(int *array, int i, int x) {
 }
 
 void insert(int *array, int *pn, int x) {
-	int *last = array+(*pn);
-	last = new int;
 	int i = (*pn);
 	array[i] = INT_MAX;
 	
@@ -110,23 +108,24 @@ void print(int *array, int n) {
 int main() {
 	int n;
 	cin >> n;
-	int *array = new int[n];
-	for (int i =0; i < n; i++) {
-		cin >> array[i];
-	}
-	buildMinHeap(array, n);
+	int array[n];
+	int l = 0;
+	// for (int i =0; i < n; i++) {
+	// 	cin >> array[i];
+	// }
+	// buildMinHeap(array, n);
 
-	cout << array[0] << endl;
-	cout << extractMin(array, &n) << endl;
-	print(array, n);
-	insert(array, &n, -1);
-	print(array, n);
-	decreaseKey(array, 4, -2);
-	print(array, n);
-	insert(array, &n, 5);
-	print(array, n);
-	decreaseKey(array, 1, -3);
-	print(array, n);
-	deleteKey(array, &n, 3);
-	print(array, n);
+	// cout << array[0] << endl;
+	// cout << extractMin(array, &n) << endl;
+	// print(array, n);
+	insert(array, &l, 1);
+	print(array, l);
+	// decreaseKey(array, 4, -2);
+	// print(array, n);
+	// insert(array, &n, 5);
+	// print(array, n);
+	// decreaseKey(array, 1, -3);
+	// print(array, n);
+	// deleteKey(array, &n, 3);
+	// print(array, n);
 }
