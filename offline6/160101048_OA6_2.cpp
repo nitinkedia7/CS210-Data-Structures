@@ -6,8 +6,8 @@
 using namespace std;
 
 struct customer {
-	int o;
-	int c;
+	long long int o;
+	long long int c;
 };
 
 int findMin(customer *array, int i, int j) {
@@ -20,27 +20,23 @@ int findMin(customer *array, int i, int j) {
 }
 
 void swapper(customer *array, int i, int j) {
-	customer temp;
-	temp.c = array[i].c;
-	temp.o = array[i].o;
-	array[i].c = array[j].c;
-	array[i].o = array[j].o;
-	array[j].c = temp.c;
-	array[j].o = temp.o;
+	customer temp = array[i];
+	array[i] = array[j];
+	array[j] = temp;
 }
 
 void minHeapify(customer *array, int n, int i) {
 	if (n > 2*i+2) {
 		int k = findMin(array, i, findMin(array, 2*i+1, 2*i+2));
 		if (k != i) {
-			swap(array[i], array[k]);
+			swapper(array, i, k);
 			minHeapify(array, n, k);
 		}
 	}
 	else if (n == 2*i+2) {
 		int k = findMin(array, i , 2*i+1);
 		if (k != i) {
-			swap(array[i], array[k]);
+			swapper(array, i, k);
 			minHeapify(array, n, k);
 		} 
 	}  	
@@ -54,8 +50,7 @@ void buildMinHeap(customer *array, int n) {
 
 void decreaseKey(customer *array, int i, customer x) {
 	if (x.c < array[i].c) {
-		array[i].c = x.c;
-		array[i].o = x.o;
+		array[i] = x;
 		int p = (i-1)/2;
 		while (p >= 0) {
 			if (i == findMin(array, i, p))  {
@@ -67,14 +62,12 @@ void decreaseKey(customer *array, int i, customer x) {
 		}
 	}
 }
-
-
 void insert(customer *array, int *pn, customer x) {
 	customer *last = array+(*pn);
 	last = new customer;
 	int i = (*pn);
-	array[i].c = INT_MAX;
-	array[i].o = INT_MAX;
+	array[i].c = LLONG_MAX;
+	array[i].o = LLONG_MAX;
 	
 	decreaseKey(array, i, x);
 	*pn = *pn+1;
@@ -83,8 +76,8 @@ void insert(customer *array, int *pn, customer x) {
 customer extractMin(customer *array, int *pn) {
 	customer min = array[0];
 	array[0] = array[*pn-1];
-	minHeapify(array, *pn, 0);
 	(*pn)--;
+	minHeapify(array, *pn, 0);
 	return min;
 }
 
@@ -122,50 +115,39 @@ int main() {
 	int n;
 	cin >> n;
 
-	customer array[n];
+	customer in_array[n];
 	for (int i = 0; i < n; i++) {
-		cin >> array[i].o >> array[i].c;
+		cin >> in_array[i].o >> in_array[i].c;
 	}
-	print(array, n);
-	quickSort(array, 0, n-1);
-	print(array, n);
+	print(in_array, n);
+	quickSort(in_array, 0, n-1);
+	print(in_array, n);
 
 	customer serve_array[n];
 	int i = 0, j = i+1;
-	unsigned int time_elapsed = 0;
-	serve_array[i] = array[i]; 
+	long long int time_elapsed = 0, total_wait_time = 0;
+	serve_array[i] = in_array[i]; 
 	customer priority_queue[n]; int l = 0;
 	do {
-		time_elapsed += serve_array[i].c;	
-		while (j < n && array[j].o <= time_elapsed) {
-			priority_queue[l++] = array[j];
+		if (time_elapsed > serve_array[i].o) time_elapsed += serve_array[i].c;
+		else time_elapsed = serve_array[i].o + serve_array[i].c;
+
+		total_wait_time += (time_elapsed - serve_array[i].o);
+	
+		while (j < n && in_array[j].o <= time_elapsed) {
+			priority_queue[l++] = in_array[j];
 			j++;
 		}
 		buildMinHeap(priority_queue, l);
 		// print(priority_queue, l);
 		i++;
 		if (l > 0) serve_array[i] = extractMin(priority_queue, &l);
-		else {
-			serve_array[i] = array[i];
-			time_elapsed = array[i].c;
-		} 
+		// else {
+		// 	serve_array[i] = array[i];
+		// 	time_elapsed = array[i].c;
+		// } 
 	}while (i < n);
 	print(serve_array, n);
 
-	unsigned int time[n] = {serve_array[0].c};
-	for (int i = 1; i < n; i++) {
-		if (time[i-1] > serve_array[i].o)
-		time[i] = time[i-1] + serve_array[i].c;
-		else time[i] = serve_array[i].o + serve_array[i].c;
-	}
-	for (int i = 0; i < n; i++) {
-		time[i] -= serve_array[i].o;
-	}
-	unsigned int sum = 0;
-	for (int i = 0; i < n; i++) {
-		sum += time[i];
-	}
-	sum = sum/n;
-
-	cout << sum << endl;
+	cout << (total_wait_time/n) << endl;
 }
