@@ -123,14 +123,12 @@ node *binomial_heap_union(node *x, node *y) {
 			node1 = node2;
 		}
 	}
-	// show_binomial_heap(head);	
 	return head;
 }
 
 node *binomial_heap_insert(node *head1, int x) {
 	node *head2 = create_node(x);
 	node *head = binomial_heap_union(head1, head2);
-	// show_binomial_heap(head);
 	return head;
 }
 
@@ -168,8 +166,22 @@ int binomial_heap_extractMin(node **pHead) {
 
 	int min_key = min->key;
 	node *head2 = reverse(min->lchild);
+	delete min;
 	*pHead = binomial_heap_union(*pHead, head2);
 	return min_key;
+}
+
+void free_binomial_heap(node *head) {
+	if (head != NULL) {
+		if (head->sibling != NULL ) {
+			free_binomial_heap(head->sibling);
+		}
+		if (head->lchild != NULL) {
+			free_binomial_heap(head->lchild);
+		}
+		// cout << "Deleted " << head->key << endl;
+		delete head;		
+	}
 }
 
 int main() {
@@ -177,10 +189,13 @@ int main() {
 	int arg;
 	char flag = '-';
 	node *head = NULL;
+	cout << "Enter input (press q to quit):" << endl;
+	cout << "Print after ectractMin is initally OFF." << endl;
 	while (1) {
 		cin >> cmd;
 		if (cmd == '#') cin.ignore(10000, '\n');
 		else if (cmd == 'c') {
+			free_binomial_heap(head);
 			head = NULL;
 		}
 		else if (cmd == 'u') {}
