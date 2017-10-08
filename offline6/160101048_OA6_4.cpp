@@ -4,12 +4,12 @@
 #include <iostream>
 #include <bits/stdc++.h>
 using namespace std;
-
+// struct for each node of bimomial_heap
 struct node {
 	int key, degree;
 	node *lchild, *sibling;
 };
-
+// initialise a pointer to node with given key
 node *create_node(int key) {
 	node *head = new node;
 	head->key = key;
@@ -18,9 +18,9 @@ node *create_node(int key) {
 	head->sibling = NULL;
 	return head;
 }
-
+// show_heap_helper prints the bimomial heap with format
 void show_heap_helper(node *head, int depth) {
-	if (head->sibling != NULL ) {
+	if (head->sibling != NULL ) { // print last sibling first
 		show_heap_helper(head->sibling, depth);
 	}
 	if (head->lchild != NULL) {
@@ -34,8 +34,9 @@ void show_heap_helper(node *head, int depth) {
 		cout << endl;
 	}
 	if (head->lchild != NULL) 
-		show_heap_helper(head->lchild, depth + 1);
+		show_heap_helper(head->lchild, depth + 1); // print leftmost child last
 }
+// wrapper function for show_heap_helper
 void show_binomial_heap(node *head) {
 	cout << "Stucture of binomial heap rotated 90 degrees anticlockwise:" << endl;
 	if (head == NULL) cout << "Empty binomial heap." << endl;
@@ -48,9 +49,10 @@ void binomial_link(node *x, node *y) {
 	x->lchild = y;
 	x->degree += 1;
 }
+// binomial_merge merges two binomial root lists(already sorted) like merge in mergeSort recursively
 void binomial_merge(node *x, node *y, node **pHead) {
 	if (x != NULL && y != NULL) {
-		if (x->degree <= y->degree) {
+		if (x->degree <= y->degree) { // both are alive
 			*pHead = x;
 			binomial_merge(x->sibling, y, &((*pHead)->sibling));
 		}
@@ -60,7 +62,7 @@ void binomial_merge(node *x, node *y, node **pHead) {
 		}
 	}
 	else {
-		if (y != NULL) {
+		if (y != NULL) { // one is dead
 			*pHead = y;
 			binomial_merge(x, y->sibling, &((*pHead)->sibling));
 		}
@@ -68,31 +70,33 @@ void binomial_merge(node *x, node *y, node **pHead) {
 			*pHead = x;
 			binomial_merge(x->sibling, y, &((*pHead)->sibling));			
 		}
-		else *pHead = NULL;
+		else *pHead = NULL; // both are dead
 	}
 }
+// binomial_heap_union makes a binomial_heap from two parent binomial_heaps
 node *binomial_heap_union(node *x, node *y) {
 	node *head = NULL;
-	binomial_merge(x, y, &head);
-
+	binomial_merge(x, y, &head); // first merge the parents
+	// iteratively consolidating the daughter root list to satisfy binomial heap condition
+	// node0, node1, node2, node 3 (if exist) are collinear, node1 iterates through root list
 	node *node1 = head;
 	node *node0 = NULL;
 	while (node1 != NULL) {
 		node *node2 = node1->sibling;
 		if (node2 != NULL) {
 			node *node3 = node2->sibling;
-			if (node1->degree != node2->degree) {
+			if (node1->degree != node2->degree) { // if consecutive degree doesn't match move forward
 				node0 = node1; 
 				node1 = node2;
 			}
 			else { 
-				if (node3 != NULL) {
+				if (node3 != NULL) { // degree(node1) = degree(node2) = degree(node3) move forward
 					if (node2->degree == node3->degree) {
 						node0 = node1;
 						node1 = node2; 
 					}
 					else {
-						if (node1->key < node2->key) {
+						if (node1->key < node2->key) { // degree(node1) = degree(node2) != degree(node3), link node1 & node2 acc. to key
 							binomial_link(node1, node2);
 							node1->sibling = node3;
 						}
@@ -105,7 +109,7 @@ node *binomial_heap_union(node *x, node *y) {
 					}
 				}
 				else {
-					if (node1->key < node2->key) {
+					if (node1->key < node2->key) { // degree(node1) = degree(node2) and node3 doesn't exist, link node1 and node2 acc. key 
 						binomial_link(node1, node2);
 						node1->sibling = node3;
 					}
@@ -125,13 +129,13 @@ node *binomial_heap_union(node *x, node *y) {
 	}
 	return head;
 }
-
+// insert an element to binomial_heap
 node *binomial_heap_insert(node *head1, int x) {
-	node *head2 = create_node(x);
-	node *head = binomial_heap_union(head1, head2);
+	node *head2 = create_node(x); // create a singleton binomial heap
+	node *head = binomial_heap_union(head1, head2); // take union with main binomial heap 
 	return head;
 }
-
+// reverse a singly linked list (childs of min_node in this case)
 node *reverse(node *head) {
 	if (head != NULL) {
 		node *temp1 = head->sibling;
@@ -146,11 +150,12 @@ node *reverse(node *head) {
 	}
 	return head;
 }
+// return and delete minimum element from the heap
 int binomial_heap_extractMin(node **pHead) {
 	node *prev = NULL;
 	node *next = *pHead;
 
-	node *min = *pHead;
+	node *min = *pHead; // find min key in root list, detach it from the list
 	node *min_prev = NULL;
 	while (next != NULL) {
 		if (next->key < min->key) {
@@ -161,16 +166,16 @@ int binomial_heap_extractMin(node **pHead) {
 		next = next->sibling;
 	}
 
-	if (min_prev != NULL) min_prev->sibling = min->sibling;
+	if (min_prev != NULL) min_prev->sibling = min->sibling; // fix connections
 	else *pHead = min->sibling;
 
 	int min_key = min->key;
-	node *head2 = reverse(min->lchild);
+	node *head2 = reverse(min->lchild); // reverse childs of min_node so that they become a new binomial_heap
 	delete min;
-	*pHead = binomial_heap_union(*pHead, head2);
+	*pHead = binomial_heap_union(*pHead, head2); // take union of siblings and root list
 	return min_key;
 }
-
+// free_binomial_heap function recursively frees memory space previously allocated to now NULL pointers 
 void free_binomial_heap(node *head) {
 	if (head != NULL) {
 		if (head->sibling != NULL ) {
@@ -185,43 +190,50 @@ void free_binomial_heap(node *head) {
 }
 
 int main() {
-	char cmd;
-	int arg;
-	char flag = '-';
+	char cmd; // command
+	int arg;  // argument (if any)
+	char flag = '-'; // to print after extracteMin or not, + ON, - OFF
 	node *head = NULL;
-	cout << "Enter input (press q to quit):" << endl;
-	cout << "Print after ectractMin is initally OFF." << endl;
+	cout << "Enter input (press q to quit or append q to input_file):" << endl;
+	cout << "MAKE_BINOMIAL_HEAP: c" << endl;
+	cout << "BINOMIAL_HEAP_INSERT: i" << endl;
+	cout << "BINOMIAL_HEAP_EXTRACTMIN: d" << endl;
+	cout << "PRINT_EXTRACTMIN: +(ON), -(OFF, default)" << endl;
+	cout << "BINOMIAL_HEAP_UNION: u" << endl;
+	cout << "PRINT_BINOMIAL_HEAP: S" << endl;
 	while (1) {
 		cin >> cmd;
-		if (cmd == '#') cin.ignore(10000, '\n');
-		else if (cmd == 'c') {
+		if (cmd == '#') cin.ignore(10000, '\n'); // ignore comment line
+		else if (cmd == 'c') { // MAKE_BINOMIAL_HEAP: c
 			free_binomial_heap(head);
 			head = NULL;
 		}
-		else if (cmd == 'u') {}
-		else if (cmd == 'i') {
+		else if (cmd == 'i') {  // BINOMIAL_HEAP_INSERT: i
 			cin >> arg;
 			head = binomial_heap_insert(head, arg);
 		}
-		else if (cmd == 'd') {
+		else if (cmd == 'u') { // BINOMIAL_HEAP_UNION: u
+			cout << "Only used internally like in insert, extractMin." << endl;
+		} 
+		else if (cmd == 'd') {	// BINOMIAL_HEAP_EXTRACTMIN: d
 			if (head != NULL) {
 				arg = binomial_heap_extractMin(&head);
 				if (flag == '+') cout << "Minimum extracted: " << arg << endl;
 			}
 			else cout << "Cannot extractMin from empty heap." << endl;
  		}
-		else if (cmd == '+') {
+		else if (cmd == '+') { // print flag ON
 			flag = '+';
 			cout << "Print after extractMin: ON" << endl;
 		}
-		else if (cmd == '-') {
+		else if (cmd == '-') { // print flag OFF
 			flag = '-';
 			cout << "Print after extractMin: OFF" << endl;
 
 		}
-		else if (cmd == 'S') {
+		else if (cmd == 'S') { // PRINT_BINOMIAL_HEAP: S 
 			show_binomial_heap(head);
 		}
-		else if (cmd == 'q') return 0;
+		else if (cmd == 'q') return 0; // q for quit
 	}
 }
