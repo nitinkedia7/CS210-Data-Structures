@@ -194,15 +194,14 @@ int main() {
 	int arg;  // argument (if any)
 	char flag = '-'; // to print after extracteMin or not, + ON, - OFF
 	node *head = NULL;
-	cout << "Enter input (press q to quit or append q to input_file):" << endl;
+	cout << "Enter input (press q to quit):" << endl;
 	cout << "MAKE_BINOMIAL_HEAP: c" << endl;
 	cout << "BINOMIAL_HEAP_INSERT: i" << endl;
 	cout << "BINOMIAL_HEAP_EXTRACTMIN: d" << endl;
 	cout << "PRINT_EXTRACTMIN: +(ON), -(OFF, default)" << endl;
 	cout << "BINOMIAL_HEAP_UNION: u" << endl;
 	cout << "PRINT_BINOMIAL_HEAP: S" << endl;
-	while (1) {
-		cin >> cmd;
+	while (cin >> cmd) {
 		if (cmd == '#') cin.ignore(10000, '\n'); // ignore comment line
 		else if (cmd == 'c') { // MAKE_BINOMIAL_HEAP: c
 			free_binomial_heap(head);
