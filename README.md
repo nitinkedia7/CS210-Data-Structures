@@ -29,9 +29,12 @@ Languages Used- **C/C++**
 - [Heapsort](https://github.com/nitinkedia7/cs210_data_structures/blob/master/labTest2/160101048_LT2_1.c)
 
 ### Heap
+- [minHeap using array](https://github.com/nitinkedia7/cs210_data_structures/blob/master/offline6/160101048_OA6_3.cpp)
 - [Priority Queue using minHeap](https://github.com/nitinkedia7/cs210_data_structures/blob/master/practice/minHeapPQ.cpp)
+- [Binomial heap with Commandline Interface](https://github.com/nitinkedia7/cs210_data_structures/blob/master/offline6/160101048_OA6_4.cpp)
 
-Some problems involving specific scenarios which are to be solved using one's knowledge of data structures are also present.
+
+Problems involving specific scenarios which are to be solved using one's knowledge of data structures are also present.
 
 ### Author
 [Nitin Kedia](https://github.com/nitinkedia7/)
