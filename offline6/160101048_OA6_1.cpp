@@ -7,68 +7,82 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-
-bool insert(char *array, char c) {
-	int i = 0;
-	while (array[i] != '\0') {
-		if (array[i++] == c) return false;
-	}
-	if (array[i] == '\0') {
-		array[i] = c;
-		array[i+1] = '\0';
-		return true;
-	}
-}
-
-bool find_conflict_helper(char before[26][25], char c, char *well) {
-	int i = c-'a';
-	int j = 0;
-	while (before[i][j] != '\0') {
-		if (!(insert(well, before[i][j]))) return true;
-		find_conflict_helper(before, before[i][j], well);
-		j++;
-	}
-	if (before[i][j] == '\0') {
-		int k = 0;
-		while (well[k] != '\0') k++;
-		if (k > 0) well[--k] = '\0';
-	}
-}
-
-bool find_conflict(char before[26][25]) {
+// utility function for printing 2D array
+void print(int matrix[26][26]) {
 	for (int i = 0; i < 26; i++) {
-		char well[100];
-		well[0] = '\0';
-		if (find_conflict_helper(before, 'a'+i, well)) return true;
+		for (int j = 0; j < 26; j++) {
+			cout << setw(2) << matrix[i][j];
+		}
+		cout << endl;
 	}
-	return false;
+	cout << endl;
 }
+
+bool checker(int matrix[26][26], int a, int b) { // input is given that position of char a is less than char b, also a != b,
+	// Part 1: a < b => matrix[a][b] must be set to 0, if previously it was 1 then it's a contradiction
+	if (matrix[a][b] == 1) {
+		// print(matrix);
+		return false;
+	}
+	else matrix[a][b] = 0;
+	
+	// Part 2: b > a => matrix[b][a] must be set to 1, if previously it was 0 then it's a contradiction
+	if (matrix[b][a] == 0) {
+		// print(matrix);
+		return false;
+	}
+	else matrix[b][a] = 1; 
+	
+	// Part 3: a < b and if (i < a) => i < b , for every i, check for contradiction
+	for (int i = 0; i < 26; i++) {
+		if (matrix[a][i] == 1) {
+			if (matrix[b][i] == 0) {
+				// print(matrix);
+				return false;
+			}
+			else matrix[b][i] = 1;
+		}
+	}
+	
+	// Part 4: b > a and if (i > b) => i > a, for every i, check for contradiction
+	for (int i = 0; i < 26; i++) {
+		if (matrix[b][i] == 0) {
+			if (matrix[a][i] == 1) {
+				// print(matrix);
+				return false;
+			}
+			else matrix[a][i] = 0;
+		}
+	}
+	// print(matrix);
+	return true; // if all test passed, data till now is valid
+ }
 
 int main() {
 	int n;
 	cin >> n;
-	// scan and store the words in a 2D array
-	char words[n][100];
-	for (int i = 0; i < n; i++) {
-		scanf("%s", words[i]);
-	}
-
-	char before[26][25];
+	// matrix stores the relationship between two alphabets, matrix[a][b] = 1 if a > b, 0 if a < b, -1 if no information or a == b
+	int matrix[26][26];
 	for (int i = 0; i < 26; i++) {
-		before[i][0] = '\0';
+		for (int j = 0; j < 26; j++) {
+			matrix[i][j] = -1;
+		}
 	}
-
+	char word[101];
 	for (int i = 0; i < n; i++) {
-		int l = strlen(words[i]);
-		for (int j = 0; j < l; j++) {
+		scanf("%s", word);
+		for (int j = 0; word[j] != '\0'; j++) {
 			for (int k = 0; k < j; k++) {
-				if (words[i][j] != words[i][k]) {
-					insert(before[words[i][j]-'a'], words[i][k]);
+				if (word[k] != word[j]) { // contradiction can only occur for different alphabets
+					if (!(checker(matrix, word[k]-'a', word[j]-'a'))) { // no sequence can exist if we get even one contardiction
+						cout << "Impossible" << endl;
+						return 0;
+ 					}
 				}
 			}
 		}
 	}
-	if (find_conflict(before)) cout << "Impossible" << endl;
-	else cout << "Possible" << endl;
+	// print(matrix);
+	cout << "Possible" << endl; // All relationships can co-exist without any contradictions 
 	return 0;
 }
