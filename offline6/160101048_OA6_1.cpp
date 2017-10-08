@@ -8,64 +8,78 @@
 using namespace std;
 
 // utility function for printing 2D array
-void print(int matrix[26][26]) {
+void print(int *half_matrix[26]) {
 	for (int i = 0; i < 26; i++) {
-		for (int j = 0; j < 26; j++) {
-			cout << setw(2) << matrix[i][j];
+		for (int j = 0; j < i; j++) {
+			cout << setw(2) << half_matrix[i][j];
 		}
 		cout << endl;
 	}
 	cout << endl;
 }
+bool checker_helper(int *half_matrix[26], int a, int b) {
+	// checking that half_matrix[a][b]=0 or half_matrix[b][a]=1 whichever is present in the half_matrix
+	if (a > b) {
+		if (half_matrix[a][b] == 1) {
+			//print(half_matrix);
+			return false;
+		}
+		else half_matrix[a][b] = 0;
+	}
+	else if (a < b) {
+		if (half_matrix[b][a] == 0) {
+			//print(half_matrix);
+			return false;
+		}
+		else half_matrix[b][a] = 1; 
+	}
+	return true;
+}
 
-bool checker(int matrix[26][26], int a, int b) { // input is given that position of char a is less than char b, also a != b,
-	// Part 1: a < b => matrix[a][b] must be set to 0, if previously it was 1 then it's a contradiction
-	if (matrix[a][b] == 1) {
-		// print(matrix);
-		return false;
-	}
-	else matrix[a][b] = 0;
-	
-	// Part 2: b > a => matrix[b][a] must be set to 1, if previously it was 0 then it's a contradiction
-	if (matrix[b][a] == 0) {
-		// print(matrix);
-		return false;
-	}
-	else matrix[b][a] = 1; 
-	
-	// Part 3: a < b and if (i < a) => i < b , for every i, check for contradiction
+bool checker(int *half_matrix[26], int a, int b) { // input is given that position of char a is less than char b, also a != b,
+	// Part 1: char(a) < char(b), this data should be verified from half-half_matrix
+	if (!(checker_helper(half_matrix, a, b))) return false;
+	// Part 2: char(a) < char(b) and if char(i) < char(a) => char(i) < char(b) , for every i, check for contradiction
 	for (int i = 0; i < 26; i++) {
-		if (matrix[a][i] == 1) {
-			if (matrix[b][i] == 0) {
-				// print(matrix);
-				return false;
+		if (a > i) {
+			if (half_matrix[a][i] == 1) {
+				 if (!(checker_helper(half_matrix, i, b))) return false;
 			}
-			else matrix[b][i] = 1;
+		}
+		else if (a < i) {
+			if (half_matrix[i][a] == 0) {
+				if (!(checker_helper(half_matrix, i ,b))) return false;
+			}
 		}
 	}
-	
-	// Part 4: b > a and if (i > b) => i > a, for every i, check for contradiction
+	// Part 3: char(b) > char(a) and if char(i) > char(b) => char(i) > char(a) , for every i, check for contradiction
 	for (int i = 0; i < 26; i++) {
-		if (matrix[b][i] == 0) {
-			if (matrix[a][i] == 1) {
-				// print(matrix);
-				return false;
+		if (b > i) {
+			if (half_matrix[b][i] == 0) {
+				if (!(checker_helper(half_matrix, a, i))) return false;
 			}
-			else matrix[a][i] = 0;
+		}
+		else if (b < i) {
+			if (half_matrix[i][b] == 1) {
+				if (!(checker_helper(half_matrix, a, i))) return false;
+			}
 		}
 	}
-	// print(matrix);
+	// print(half_matrix);
 	return true; // if all test passed, data till now is valid
  }
 
 int main() {
 	int n;
 	cin >> n;
-	// matrix stores the relationship between two alphabets, matrix[a][b] = 1 if a > b, 0 if a < b, -1 if no information or a == b
-	int matrix[26][26];
+	// half_matrix stores the relationship between two alphabets, 
+	// for (int a < int b), half_matrix[a][b] = 1 if char(a) > char(b), 0 if char(a) < char(b), -1 if no information or char(a) == char(b)
+	// else same info is stored in matrix[b][a], this removes redundancy
+	int *half_matrix[26];
 	for (int i = 0; i < 26; i++) {
-		for (int j = 0; j < 26; j++) {
-			matrix[i][j] = -1;
+		half_matrix[i] = new int[i];
+		for (int j = 0; j < i; j++) {
+			half_matrix[i][j] = -1;
 		}
 	}
 	char word[101];
@@ -74,7 +88,7 @@ int main() {
 		for (int j = 0; word[j] != '\0'; j++) {
 			for (int k = 0; k < j; k++) {
 				if (word[k] != word[j]) { // contradiction can only occur for different alphabets
-					if (!(checker(matrix, word[k]-'a', word[j]-'a'))) { // no sequence can exist if we get even one contardiction
+					if (!(checker(half_matrix, word[k]-'a', word[j]-'a'))) { // no sequence can exist if we get even one contardiction
 						cout << "Impossible" << endl;
 						return 0;
  					}
@@ -82,7 +96,6 @@ int main() {
 			}
 		}
 	}
-	// print(matrix);
 	cout << "Possible" << endl; // All relationships can co-exist without any contradictions 
 	return 0;
 }
