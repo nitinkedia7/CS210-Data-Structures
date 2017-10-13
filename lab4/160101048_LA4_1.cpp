@@ -48,7 +48,7 @@ void minHeapify(int *H, int n, int i) {
 }
 // to build the heap minHeapify all non-leaf nodes
 void buildHeap(int *H, int n) {
-	for (int i = (n/3)-1; i >=0; i--) {
+	for (int i = (n/3); i >=0; i--) {
 		minHeapify(H, n, i);
 	}
 }
