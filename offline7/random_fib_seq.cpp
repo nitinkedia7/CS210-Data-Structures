@@ -10,7 +10,7 @@ int main() {
 	srand(time(NULL));
 	int arg;
 	for (int i = 0; i < n; i++) {
-		arg = rand() % 100*n + 1;
+		arg = rand() % 1000*n + 1;
 		cout << "i " << arg << endl;
 	}
 	for (int i = 0; i < n+2; i++) {
