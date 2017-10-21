@@ -99,9 +99,9 @@ int main() {
 		enqueue(&(array[ri].link), rj);
 		enqueue(&(array[rj].link), ri);
 	}
-	// print(array, n+1);
+	// print(array, n);
 	assign_moral(array, n+1, ri);
-	print(array, n+1);
+	// print(array, n);
 
 	for (int i = 0; i < r; i++) {
 		int ri = array[rival1[i]].d;
