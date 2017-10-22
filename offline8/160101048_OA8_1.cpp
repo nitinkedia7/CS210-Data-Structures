@@ -127,15 +127,23 @@ int main() {
 	}
 
 	int e1, e2; // scan edges
+	int cycles = 0;    // to store number of cycles
+	adj_node *cycle_head = NULL; // to store cycles
 	for (int i = 0; i < e; i++) {
 		cin >> e1 >> e2;
-		enqueue(&(array[e1].link), e2);
-		enqueue(&(array[e2].link), e1);
+		if (e1 != e2) {
+			enqueue(&(array[e1].link), e2);
+			enqueue(&(array[e2].link), e1);
+		}
+		else {
+			cycles++;
+			enqueue(&(cycle_head), e1);
+			enqueue(&(cycle_head), e2);
+		}
 	}
 		
 	int component = 0; // to specify component number of each element
-	int cycles = 0;    // to store number of cycles
-	adj_node *cycle_head = NULL; // to store cycles
+
 	dfs(array, n, &component, &cycle_head, &cycles);
 	// print(array, n);
 	print_connected(array, n, component);
