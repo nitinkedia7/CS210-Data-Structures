@@ -1,0 +1,15 @@
+10 14
+q s
+s v
+v w
+w s
+q w
+q t
+t x
+x z
+z x
+t y
+y q
+r y
+r u
+u y
