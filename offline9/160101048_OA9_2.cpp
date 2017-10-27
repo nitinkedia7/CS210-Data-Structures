@@ -4,57 +4,45 @@
 #include <iostream>
 using namespace std;
 
-struct adj_node {
-	int index;
-	adj_node *ptr;
-};
-
 struct node {
-	int color, d, parent;
+	int color, d;
 	int next_states[8];
 };
 
-void enqueue(adj_node **pHead, int index) {
-	adj_node *temp = new adj_node;
-	temp->index = index;
-	temp->ptr = *pHead;
+struct queue {
+	int front, rear;
+	int array[10000];
+};
 
-	*pHead = temp;
+void enqueue(queue *q, int x) {
+	(q->array)[(q->rear)++] = x;
 }
 
-int dequeue(adj_node **pHead) {
-	if (*pHead != NULL) {
-		int n;
-		if ((*pHead)->ptr != NULL) {
-			adj_node *next = *pHead;
-			adj_node *prev = NULL;
-			while (next->ptr != NULL) {
-				prev = next;
-				next = next->ptr;
-			}
-			prev->ptr = NULL;
-			n = next->index;
-			delete next;
-		}
-		else {
-			n = (*pHead)->index;
-			delete *pHead;
-			*pHead = NULL;
-		}
-		return n;
+int dequeue(queue *q) {
+	return (q->array)[(q->front)++]; 
+}
+
+int convert(int array[4]) {
+	int n = 0;
+	for (int i = 3; i >= 0; i--) {
+		n *= 10;
+		n += array[i];
 	}
+	return n;
 }
 
-void bfs(node *array, int s) {
+void bfs(node *array, int s, int e) {
 	// initial attributes already assigned
 	array[s].d = 0;
 	array[s].color = 0; // gray
 	
-	adj_node *queue = NULL;
-	enqueue(&queue, s);
+	queue q;
+	q.front = 0;
+	q.rear = 0;
+	enqueue(&q, s);
 
-	while (queue != NULL) {
-		int u = dequeue(&queue);
+	while (q.front < q.rear) {
+		int u = dequeue(&q);
 
 		for (int i = 0; i < 8; i++) {
 			int v = array[u].next_states[i];
@@ -62,21 +50,19 @@ void bfs(node *array, int s) {
 			if (array[v].color == -1) {
 				array[v].color = 0;
 				array[v].d = array[u].d + 1;
-				enqueue(&queue, v);
+				if (v == e) return;
+				enqueue(&q, v);
 			}
 		}
 		array[u].color = 1; // black
 	}
 }
-int scan() {
-	int n = 0, k = 0, i = 1000;
-	while (i > 0) {
-		cin >> k;
-		n += (k * i);
-		i = i/10; 
+
+void scan(int array[4]) {
+	for (int i = 3; i >= 0; i--) {
+		cin >> array[i];
 	}
-	return n;
- }
+}
 
 int main() {
 	int n;
@@ -84,23 +70,38 @@ int main() {
 
 	node array[10000];
 	for (int i = 0; i < 10000; i++) {
-		int pow1 = 1;
-
+		int n = i;
+		int digits[4];
 		for (int j = 0; j < 4; j++) {
-			int pow2 = pow1*10;
-			int k = i % pow2;
+			digits[j] = n%10;
+			n = n/10;
+		}
+		int aux_array[8][4];
+		for (int j = 0; j < 8; j++) {
+			for (int k = 0; k < 4; k++) {
+				aux_array[j][k] = digits[k];
+			}
+		}
+		aux_array[0][0] = (digits[0]+1)%10;
+		aux_array[1][0] = (digits[0]+9)%10;
+		aux_array[2][1] = (digits[1]+1)%10;
+		aux_array[3][1] = (digits[1]+9)%10;
+		aux_array[4][2] = (digits[2]+1)%10;
+		aux_array[5][2] = (digits[2]+9)%10;
+		aux_array[6][3] = (digits[3]+1)%10;
+		aux_array[7][3] = (digits[3]+9)%10;
 
-			array[i].next_states[2*j] = i - k + (k + pow1 + pow2) % (pow2);
-			array[i].next_states[2*j+1] = i - k + (k - pow1 + pow2) % (pow2);
-			pow1 = pow2;
+		for (int j = 0; j < 8; j++) {
+			array[i].next_states[j] = convert(aux_array[j]);
 		}
 	}
 
 	for (int i = 0; i < n; i++) {
-		int start = scan(), end = scan();
+		int start[4], end[4];
+		scan(start);
+		scan(end);
 
 		for (int k = 0; k < 10000; k++) {
-			array[k].parent = -1;
 			array[k].color = -1;
 			array[k].d = -1;
 		}
@@ -108,10 +109,11 @@ int main() {
 		int f;
 		cin >> f;
 		for (int j = 0; j < f; j++) {
-			int forbidden = scan();
-			array[forbidden].color = 1;
+			int forbidden[4];
+			scan(forbidden);
+			array[convert(forbidden)].color = 1;
 		}
-		bfs(array, start);
-		cout << array[end].d << endl;
+		bfs(array, convert(start), convert(end));
+		cout << array[convert(end)].d << endl;
 	}
 }
