@@ -3,3 +3,9 @@
 
 # Submission Zips
 *.zip
+
+# CPP syntax test files
+test.cpp 
+
+# Assignment specific files
+offline9/input.txt
