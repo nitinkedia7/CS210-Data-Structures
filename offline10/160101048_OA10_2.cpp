@@ -28,7 +28,7 @@ void hash_string(string s, int *hash, int l) {
 }
 
 bool match_string(string s, int hash_s, string p, int hash_p) {
-	cout << s << " " << hash_s << " " << p << " " << hash_p << endl;
+	// cout << s << " " << hash_s << " " << p << " " << hash_p << endl;
 	if (hash_s == hash_p) {
 		if (s == p) return true;
 	}
@@ -60,7 +60,7 @@ bool delete_pattern(string s, string p) {
 			else ns = ns + s[j];
 		}
 		// cout << s << " " << p << " " << ns << endl;
-	} while (ns != s && s.length() >= lp);
+	} while (ns != s && ns.length() >= lp);
 	cout << ns << endl;
 }
 
