@@ -2,7 +2,6 @@
 // Description: Compare substrings using hashing
 
 #include <iostream>
-#include <cmath>
 using namespace std;
 
 void hash_value(string str, int *hash) {
@@ -11,7 +10,7 @@ void hash_value(string str, int *hash) {
 	int i = 1;
 	while (str[i] != '\0') {
 		int x = str[i] - 'a';
-		hash[i] = ( hash[i-1] * 13 + x ) % 23;
+		hash[i] = (hash[i-1] * 26 + x) % 23;
 		i++;
 	}
 }
@@ -20,9 +19,9 @@ int hash_substring(int *array, int i, int j) {
 	if (i > 0) {
 		int a = array[i-1];
 		for (int x = i; x <= j; x++) {
-			a = ( a * 13 ) % 23;
+			a = (a * 26) % 23;
 		}
-		return ( array[j] - a + 23) % 23;
+		return (array[j] - a + 23) % 23;
 	}
 	else return array[j];
 }
