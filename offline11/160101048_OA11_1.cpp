@@ -6,12 +6,14 @@ using namespace std;
 
 struct node {
 	char key;
+	bool mark;
 	node *parent, *left, *right;
 };
 
 node *create_node(char key) {
 	node *temp = new node;
 	temp->key = key;
+	temp->mark = false;
 	temp->parent = NULL;
 	temp->left = NULL;
 	temp->right = NULL;
@@ -43,87 +45,39 @@ void insert(node **pHead, char key) {
 	else y->left = temp;
 }
 
-node *successor(node *x) {
-	if (x == NULL) return NULL;
-	if (x->left != NULL) {
-		return x->left;
-	}
-	else if (x->right != NULL) {
-		return x->right;
-	}
-	else {
-		node *y = x->parent;
-		while (y != NULL && y->left != x) {
-			x = y;
-			y = x->parent;
-		}
-		if (y == NULL) return NULL;
-		else return y->right;
-	}
-}
-
-node *predecessor(node *x) {
-	if (x == NULL || x->parent == NULL) return NULL;
-	else {
-		node *y = x->parent;
-		while (y != NULL) {
-			x = y;
-			y = y->left;
-		}
-		if (x->right != NULL) return x->right;
-		else return x;
-	}
-}
-
-string preorder(node *head, node *x) {
-	string seq = "";
-	while (head != x) {
-		seq += head->key;
-		head = successor(head);
-	}
-	return seq;
-}
-
-int nodes(node *head) {
-	if (head == NULL) return 0;
-	else {
-		return 1 + nodes(successor(head));
-	}
-}
-
-string modify_string(string prefix, string test, char key, int n) {
-	string ans = "";
-	int m = test.length();
-	// cout << "m = " << m << endl;
-	// cout << "n = " << n << endl;
-	for (int i = 1; i <= n; i++) {
-		for (int j = 0; j < m; j += n) {
-			ans += prefix;
-			ans += test.substr(j,i);
-			ans += key;
-			ans += test.substr(j+i, n-i);
-		}
-	}
-	// cout << test << endl;
-	// cout << ans << endl;
-	return ans;
-}
-
-void valid_permutation(node *root, node *head, string *ans) {
+void options(node *head, node **array, int *n) {
 	if (head == NULL) return;
 	else {
-		*ans += head->key;	
-		valid_permutation(root, successor(head), ans);
-
-		if (successor(head) != NULL && predecessor(head) != NULL) {
-			string ans1 = "";
-			// *ans += preorder(root, head);
-			valid_permutation(successor(head), successor(head), &ans1);
-			int n = nodes(successor(head)); 
-			// *ans += head->key;
-			*ans += modify_string(preorder(root, head), ans1, head->key, n);
+		if (!(head->mark)) {
+			array[(*n)++] = head;
+		}
+		else {
+			options(head->left, array, n);
+			options(head->right, array, n);
 		}
 	}
+}
+
+void valid_permutation_helper(node *head, node *pres, int n, string *ans, string *all) {
+	*ans += pres->key;
+		
+	node *array[n];
+	int l = 0;
+	options(head, array, &l);
+
+	if (l == 0) *all += *ans;
+
+	for (int i = 0; i < l; i++) {
+		array[i]->mark = true;
+		valid_permutation_helper(head, array[i], n, ans, all);
+	}
+	pres->mark = false;
+	*ans = (*ans).substr(0, (*ans).length()-1);
+}
+
+void valid_permutation(node *head, int n, string *ans, string *all) {
+	head->mark = true;
+	valid_permutation_helper(head, head, n, ans, all);
 }
 
 int main() {
@@ -136,15 +90,14 @@ int main() {
 		insert(&head, preorder[i]+'0');
 	}
 
-	string ans = "";
-	valid_permutation(head, head, &ans);
-	// cout << ans << endl;
-	cout << ans.length()/n << endl;
+	string ans = "", all = "";
+	valid_permutation(head, n, &ans, &all);
+	
+	cout << all.length()/n << endl;
 	int i = 0;
-	while (i < ans.length()) {
-		cout << ans[i] << " ";
+	while (i < all.length()) {
+		cout << all[i] << " ";
 		if (i % n == n-1) cout << endl;
 		i++;
 	}
-	cout << ans.length()/n << endl;
 }
