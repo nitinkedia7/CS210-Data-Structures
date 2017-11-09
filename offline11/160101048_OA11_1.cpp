@@ -2,15 +2,16 @@
 // Description: Valid preorder permutations to obtain same BST
 
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 struct node {
-	char key;
+	int key;
 	bool mark;
 	node *parent, *left, *right;
 };
 
-node *create_node(char key) {
+node *create_node(int key) {
 	node *temp = new node;
 	temp->key = key;
 	temp->mark = false;
@@ -20,7 +21,7 @@ node *create_node(char key) {
 	return temp;
 }
 
-void insert(node **pHead, char key) {
+void insert(node **pHead, int key) {
 	node *y = NULL;
 	node *x = *pHead;
 	while (x != NULL) {
@@ -58,26 +59,40 @@ void options(node *head, node **array, int *n) {
 	}
 }
 
-void valid_permutation_helper(node *head, node *pres, int n, string *ans, string *all) {
-	*ans += pres->key;
+void valid_permutation_helper(node *root, node *pres, int n, int *stack, int *top, string *permutations, int *vp) {
+	stack[++(*top)] = pres->key;
 		
 	node *array[n];
 	int l = 0;
-	options(head, array, &l);
+	options(root, array, &l);
 
-	if (l == 0) *all += *ans;
+	if (l == 0) {
+		(*vp)++;
+		// for (int i = 0; i < n; i++) {
+		// 	cout << stack[i] << " ";
+		// }
+		// cout << endl;
+		stringstream ss;
+		for (int i = 0; i < n; i++) {
+			ss << stack[i] << " ";
+		}
+		ss << "\n";
+		*permutations += ss.str();	
+	}
 
 	for (int i = 0; i < l; i++) {
 		array[i]->mark = true;
-		valid_permutation_helper(head, array[i], n, ans, all);
+		valid_permutation_helper(root, array[i], n, stack, top, permutations, vp);
 	}
 	pres->mark = false;
-	*ans = (*ans).substr(0, (*ans).length()-1);
+	(*top)--;
 }
 
-void valid_permutation(node *head, int n, string *ans, string *all) {
+void valid_permutation(node *head, int n, string *permutations, int *vp) {
 	head->mark = true;
-	valid_permutation_helper(head, head, n, ans, all);
+	int stack[n];
+	int top = -1;
+	valid_permutation_helper(head, head, n, stack, &top, permutations, vp);
 }
 
 int main() {
@@ -87,17 +102,13 @@ int main() {
 	int preorder[n];
 	for (int i = 0; i < n; i++) {
 		cin >> preorder[i];
-		insert(&head, preorder[i]+'0');
+		insert(&head, preorder[i]);
 	}
 
-	string ans = "", all = "";
-	valid_permutation(head, n, &ans, &all);
+	string permutations = "";
+	int vp = 0;
+	valid_permutation(head, n, &permutations, &vp);
 	
-	cout << all.length()/n << endl;
-	int i = 0;
-	while (i < all.length()) {
-		cout << all[i] << " ";
-		if (i % n == n-1) cout << endl;
-		i++;
-	}
+	cout << vp << endl;
+	cout << permutations << endl;	
 }
