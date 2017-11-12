@@ -3,13 +3,14 @@ using namespace std;
 
 struct node {
 	int key, height;
-	node *left, *right;
+	node *parent, *left, *right;
 };
 
 node *create_node(int key) {
 	node *temp = new node;
 	temp->key = key;
 	temp->height = 1;
+	temp->parent = NULL;
 	temp->left = NULL;
 	temp->right = NULL;
 	return temp;
@@ -29,7 +30,10 @@ node *right_rotate(node *head) {
 	node *lchild = head->left;
 
 	head->left = lchild->right;
+	if (lchild->right != NULL) lchild->right->parent = head;
 	lchild->right = head;
+	lchild->parent = head->parent;
+	head->parent = lchild;
 
 	head->height = 1 + max(height(head->left), height(head->right));
 	lchild->height = 1 + max(height(lchild->left), height(lchild->right));
@@ -41,7 +45,10 @@ node *left_rotate(node *head) {
 	node *rchild = head->right;
 
 	head->right = rchild->left;
+	if (rchild->left != NULL) rchild->left->parent = head;
 	rchild->left = head;
+	rchild->parent = head->parent;
+	head->parent = rchild;
 
 	head->height = 1 + max(height(head->left), height(head->right));
 	rchild->height = 1 + max(height(rchild->left), height(rchild->right));
@@ -49,16 +56,18 @@ node *left_rotate(node *head) {
 	return rchild;
 }
 
-node *insert(node *head, int key) {
+node *insert(node *head, node *parent, int key) {
 	if (head == NULL) {
-		return create_node(key);
+		node *temp = create_node(key);
+		temp->parent = parent;
+		return temp;
 	}
 
 	if (key <= head->key) {
-		head->left = insert(head->left, key);
+		head->left = insert(head->left, head, key);
 	}
 	else {
-		head->right = insert(head->right, key);
+		head->right = insert(head->right, head, key);
 	}
 
 	head->height = 1 + max(height(head->left), height(head->right));
@@ -185,31 +194,31 @@ void preorder(node *head) {
 
 int main() {
 	node *root = NULL;
-	root = insert(root, 9);
+	root = insert(root, NULL, 9);
 	preorder(root);
 	cout << endl;
-	root = insert(root, 5);
+	root = insert(root, NULL, 5);
 	preorder(root);
 		cout << endl;
-	root = insert(root, 10);
+	root = insert(root, NULL, 10);
 	preorder(root);
 		cout << endl;
-	root = insert(root, 0);
+	root = insert(root, NULL, 0);
 	preorder(root);
 		cout << endl;
-	root = insert(root, 6);
+	root = insert(root, NULL, 6);
 	preorder(root);
 		cout << endl;
-	root = insert(root, 11);
+	root = insert(root, NULL, 11);
 	preorder(root);
 		cout << endl;
-		root = insert(root, -1);
+		root = insert(root, NULL, -1);
 	preorder(root);
 		cout << endl;
-		root = insert(root, 1);
+		root = insert(root, NULL, 1);
 	preorder(root);
 		cout << endl;
-			root = insert(root, 2);
+			root = insert(root, NULL, 2);
 	preorder(root);
 		cout << endl;
 
